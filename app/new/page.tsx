@@ -136,20 +136,20 @@ const New = () => {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-6">
+		<div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-accent/20 p-4 md:p-6">
 			<div className="max-w-2xl mx-auto">
 				<form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-6 md:p-8 space-y-8">
 					{/* Header */}
 					<header className="text-center mb-8">
 						<div className="mb-6">
-							<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 rounded-full text-sm font-medium text-white mb-4">
+							<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary to-accent px-4 py-2 rounded-full text-sm font-medium text-foreground mb-4">
 								<span>✨</span>
 								<span>Update Your Closet</span>
 							</div>
 						</div>
 						<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
 							Add New
-							<span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+							<span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
 								Item
 							</span>
 						</h1>
@@ -298,7 +298,7 @@ const New = () => {
 						<button
 							type="submit"
 							disabled={isLoading || !formData.name || !formData.category || !formData.description || formData.colors.length === 0}
-							className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+							className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-foreground bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 						>
 							{isLoading ? (
 								<>

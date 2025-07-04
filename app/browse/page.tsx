@@ -138,7 +138,7 @@ const BrowsePage = () => {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-6">
+			<div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-accent/20 p-4 md:p-6">
 				<div className="max-w-7xl mx-auto">
 					<div className="animate-pulse">
 						<div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
@@ -158,7 +158,7 @@ const BrowsePage = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-6">
+		<div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-accent/20 p-4 md:p-6">
 			<div className="max-w-7xl mx-auto">
 				{/* Header */}
 				<div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
@@ -336,7 +336,7 @@ const BrowsePage = () => {
 							>
 								{/* Image */}
 								<div className={`${viewMode === 'list' ? 'w-16 h-16' : 'w-full h-48'
-									} bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center overflow-hidden mb-4`}>
+									} bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center overflow-hidden mb-4`}>
 									{item.image_url ? (
 										<Image
 											src={item.image_url}

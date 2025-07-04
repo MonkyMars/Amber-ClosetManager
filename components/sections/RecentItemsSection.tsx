@@ -99,7 +99,7 @@ const RecentItemsSection = () => {
 					<p className="text-sm">Start by adding your first item to your closet!</p>
 					<Link
 						href="/new"
-						className="inline-block mt-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+						className="inline-block mt-4 px-6 py-2 bg-gradient-to-r from-primary to-accent text-foreground rounded-lg hover:shadow-lg hover:scale-105 transition-all"
 					>
 						Add Your First Item
 					</Link>

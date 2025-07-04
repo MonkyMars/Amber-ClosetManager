@@ -18,7 +18,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
 	return (
 		<Loader2
-			className={`animate-spin ${sizeClasses[size]} ${className}`}
+			className={`animate-spin text-primary ${sizeClasses[size]} ${className}`}
 		/>
 	);
 };

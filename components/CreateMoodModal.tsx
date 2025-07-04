@@ -118,11 +118,11 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 				<form onSubmit={handleSubmit} className="space-y-6">
 					{/* Header */}
 					<div className="flex items-center justify-between">
-						<h3 className="text-xl font-semibold text-gray-900">Create New Mood</h3>
+						<h3 className="text-xl font-semibold text-foreground">Create New Mood</h3>
 						<button
 							type="button"
 							onClick={onClose}
-							className="text-gray-400 hover:text-gray-600"
+							className="text-foreground opacity-50 hover:opacity-80 transition-opacity"
 						>
 							<X className="w-6 h-6" />
 						</button>
@@ -130,14 +130,14 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Title */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Mood Title *
 						</label>
 						<input
 							type="text"
 							value={formData.title}
 							onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+							className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
 							placeholder="e.g., Spring Vibes, Office Chic"
 							required
 						/>
@@ -145,13 +145,13 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Description */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Description
 						</label>
 						<textarea
 							value={formData.description}
 							onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-							className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+							className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
 							rows={3}
 							placeholder="Describe the vibe and style of this mood..."
 						/>
@@ -159,7 +159,7 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Vibe */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Vibe *
 						</label>
 						<SelectComponent
@@ -174,7 +174,7 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Emoji */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Emoji
 						</label>
 						<div className="flex flex-wrap gap-2">
@@ -183,9 +183,9 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 									key={emoji}
 									type="button"
 									onClick={() => setFormData(prev => ({ ...prev, emoji }))}
-									className={`p-2 text-2xl rounded-lg border-2 transition-colors ${formData.emoji === emoji
-											? 'border-purple-500 bg-purple-50'
-											: 'border-gray-200 hover:border-gray-300'
+									className={`p-2 text-2xl rounded-lg border-2 transition-all ${formData.emoji === emoji
+										? 'border-primary bg-primary/20'
+										: 'border-border hover:border-primary/50'
 										}`}
 								>
 									{emoji}
@@ -196,7 +196,7 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Colors */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Colors * (Select multiple)
 						</label>
 						<SelectComponent
@@ -212,7 +212,7 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 							{formData.colors.map((color, index) => (
 								<div
 									key={index}
-									className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+									className="w-8 h-8 rounded-full border-2 border-background shadow-sm"
 									style={{ backgroundColor: color }}
 									title={colorOptions.find(opt => opt.value === color)?.label || color}
 								/>
@@ -222,7 +222,7 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 
 					{/* Tags */}
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-foreground mb-2">
 							Tags
 						</label>
 						<div className="flex gap-2 mb-2">
@@ -231,13 +231,13 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 								value={tagInput}
 								onChange={(e) => setTagInput(e.target.value)}
 								onKeyPress={handleKeyPress}
-								className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+								className="flex-1 px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
 								placeholder="Add a tag and press Enter"
 							/>
 							<button
 								type="button"
 								onClick={addTag}
-								className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+								className="px-4 py-2 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
 							>
 								<Plus className="w-4 h-4" />
 							</button>
@@ -246,13 +246,13 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 							{formData.tags.map((tag, index) => (
 								<span
 									key={index}
-									className="inline-flex items-center gap-1 bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm"
+									className="inline-flex items-center gap-1 bg-primary/20 text-foreground px-3 py-1 rounded-full text-sm"
 								>
 									{tag}
 									<button
 										type="button"
 										onClick={() => removeTag(tag)}
-										className="text-purple-600 hover:text-purple-800"
+										className="text-foreground opacity-60 hover:opacity-100 transition-opacity"
 									>
 										<X className="w-3 h-3" />
 									</button>
@@ -266,14 +266,14 @@ export default function CreateMoodModal({ isOpen, onClose, onMoodCreated }: Crea
 						<button
 							type="button"
 							onClick={onClose}
-							className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+							className="flex-1 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-secondary/30 transition-colors"
 						>
 							Cancel
 						</button>
 						<button
 							type="submit"
 							disabled={loading || !formData.title.trim() || formData.colors.length === 0}
-							className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+							className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-accent text-foreground rounded-lg hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
 						>
 							{loading ? 'Creating...' : 'Create Mood'}
 						</button>

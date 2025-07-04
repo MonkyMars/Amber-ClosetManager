@@ -23,7 +23,7 @@ const SuccessPage = () => {
 				<div className="space-y-3">
 					<Link
 						href="/"
-						className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+						className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-foreground bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:scale-105 transition-all duration-200"
 					>
 						<ArrowLeft className="mr-2 h-5 w-5" />
 						Back to Home

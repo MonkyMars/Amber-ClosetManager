@@ -15,28 +15,28 @@ const QuickActionsSection = () => {
 			title: 'Add New Item',
 			description: 'Upload photos and details of your latest clothing pieces',
 			icon: '📸',
-			gradient: 'from-blue-600 to-purple-600',
+			gradient: 'from-primary to-accent',
 			href: '/new'
 		},
 		{
 			title: 'Generate Outfit',
 			description: 'Let AI create amazing outfit combinations from your closet',
 			icon: '✨',
-			gradient: 'from-purple-600 to-pink-600',
+			gradient: 'from-accent to-highlight',
 			href: '/outfits'
 		},
 		{
 			title: 'Browse Closet',
 			description: 'Explore your collection by categories, colors, or seasons',
 			icon: '👀',
-			gradient: 'from-green-600 to-blue-600',
+			gradient: 'from-secondary to-primary',
 			href: '/browse'
 		},
 		{
 			title: 'Style Analytics',
 			description: 'Discover insights about your fashion preferences',
 			icon: '📊',
-			gradient: 'from-orange-300 to-red-600',
+			gradient: 'from-highlight to-accent',
 			href: '/analytics'
 		}
 	];

@@ -22,7 +22,7 @@ const Navigation = () => {
 	return (
 		<nav className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shadow-sm">
 			<div className="flex items-center space-x-2">
-				<div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+				<div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
 					<span className="text-white font-bold text-lg">✨</span>
 				</div>
 				<h2 className="text-gray-900 text-xl font-semibold">
@@ -51,7 +51,7 @@ const Navigation = () => {
 
 				<Link
 					href={'/new'}
-					className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all ml-4"
+					className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary to-accent text-foreground rounded-lg hover:shadow-lg hover:scale-105 transition-all ml-4"
 				>
 					<Plus className="h-4 w-4" />
 					<span>Add Item</span>
@@ -62,7 +62,7 @@ const Navigation = () => {
 			<div className="md:hidden">
 				<Link
 					href={'/new'}
-					className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+					className="flex items-center space-x-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary to-accent text-foreground rounded-lg hover:shadow-lg hover:scale-105 transition-all"
 				>
 					<Plus className="h-4 w-4" />
 					<span>Add</span>
