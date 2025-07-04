@@ -177,8 +177,8 @@ const BrowsePage = () => {
 							<button
 								onClick={() => setViewMode('grid')}
 								className={`p-2 rounded ${viewMode === 'grid'
-										? 'bg-blue-100 text-blue-600'
-										: 'text-gray-400 hover:text-gray-600'
+									? 'bg-blue-100 text-blue-600'
+									: 'text-gray-400 hover:text-gray-600'
 									}`}
 							>
 								<Grid className="h-5 w-5" />
@@ -186,8 +186,8 @@ const BrowsePage = () => {
 							<button
 								onClick={() => setViewMode('list')}
 								className={`p-2 rounded ${viewMode === 'list'
-										? 'bg-blue-100 text-blue-600'
-										: 'text-gray-400 hover:text-gray-600'
+									? 'bg-blue-100 text-blue-600'
+									: 'text-gray-400 hover:text-gray-600'
 									}`}
 							>
 								<List className="h-5 w-5" />
@@ -264,15 +264,43 @@ const BrowsePage = () => {
 									onChange={(value) => handleFilterChange('tags', value as string[])}
 								/>
 
-								<SelectComponent
-									name="colors"
-									label="Colors"
-									multiple
-									options={filterOptions.colors.map(color => ({ value: color, label: color.charAt(0).toUpperCase() + color.slice(1) }))}
-									value={filters.colors}
-									placeholder="Select colors"
-									onChange={(value) => handleFilterChange('colors', value as string[])}
-								/>
+								{/* Custom Color Filter */}
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-2">
+										Colors
+									</label>
+									<div className="border border-gray-300 rounded-lg p-3 bg-white">
+										<div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+											{filterOptions.colors.map((color) => (
+												<button
+													key={color}
+													onClick={() => {
+														const newColors = filters.colors.includes(color)
+															? filters.colors.filter(c => c !== color)
+															: [...filters.colors, color];
+														handleFilterChange('colors', newColors);
+													}}
+													className={`flex items-center space-x-1 px-2 py-1 rounded-full border transition-colors ${filters.colors.includes(color)
+														? 'border-blue-500 bg-blue-50'
+														: 'border-gray-300 hover:border-gray-400'
+														}`}
+													title={color}
+												>
+													<div
+														className="w-3 h-3 rounded-full border border-gray-400"
+														style={{ backgroundColor: color }}
+													/>
+													<span className="text-xs">
+														{color.length === 7 ? color.toUpperCase() : color}
+													</span>
+												</button>
+											))}
+										</div>
+										{filterOptions.colors.length === 0 && (
+											<p className="text-sm text-gray-500">No colors available</p>
+										)}
+									</div>
+								</div>
 							</div>
 
 							<div className="mt-4 flex justify-end">
@@ -337,16 +365,23 @@ const BrowsePage = () => {
 									{item.colors && item.colors.length > 0 && (
 										<div className="flex flex-wrap gap-1 mb-2">
 											{item.colors.slice(0, 3).map((color, index) => (
-												<span
+												<div
 													key={index}
-													className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full"
+													className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-full"
 												>
-													{color}
-												</span>
+													<div
+														className="w-3 h-3 rounded-full border border-gray-300"
+														style={{ backgroundColor: color }}
+														title={color}
+													/>
+													<span className="text-xs text-gray-600">
+														{color.length === 7 ? color.toUpperCase() : color}
+													</span>
+												</div>
 											))}
 											{item.colors.length > 3 && (
 												<span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
-													+{item.colors.length - 3}
+													+{item.colors.length - 3} more
 												</span>
 											)}
 										</div>

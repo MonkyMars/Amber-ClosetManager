@@ -132,9 +132,22 @@ const RecentItemsSection = () => {
 									</h3>
 									<div className="flex items-center justify-between text-xs text-foreground opacity-70">
 										<span className="capitalize">{item.category}</span>
-										<span className="capitalize">
-											{item.colors?.[0] || 'No color'}
-										</span>
+										<div className="flex items-center space-x-1">
+											{item.colors && item.colors.length > 0 ? (
+												<>
+													<div
+														className="w-3 h-3 rounded-full border border-gray-400"
+														style={{ backgroundColor: item.colors[0] }}
+														title={item.colors[0]}
+													/>
+													<span className="text-xs">
+														{item.colors.length > 1 ? `+${item.colors.length - 1}` : ''}
+													</span>
+												</>
+											) : (
+												<span>No color</span>
+											)}
+										</div>
 									</div>
 									<p className="text-xs text-foreground opacity-50">
 										{item.created_at ? formatDate(item.created_at) : 'Unknown date'}

@@ -23,7 +23,7 @@ export interface FormData {
   name: string;
   category: string;
   description: string;
-  colors: string;
+  colors: string[];
   tags: string[];
   image_url?: string;
 }

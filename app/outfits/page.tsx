@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { ItemsService } from '@/lib/itemsService';
 import { OutfitService, Outfit } from '@/lib/outfitService';
 import { Item } from '@/lib/types';
+import { OCCASIONS, SCORING_CONSTANTS } from '@/lib/constants';
 import { Shuffle, Sparkles, Heart, RefreshCw, Palette, Tag } from 'lucide-react';
 import Image from 'next/image';
 
@@ -14,30 +15,25 @@ const OutfitGeneratorPage = () => {
 	const [loading, setLoading] = useState(true);
 	const [generating, setGenerating] = useState(false);
 	const [selectedOccasion, setSelectedOccasion] = useState('');
+	const [error, setError] = useState<string | null>(null);
 
-	const occasions = [
-		{ value: '', label: 'Any Occasion' },
-		{ value: 'casual', label: 'Casual Day Out' },
-		{ value: 'formal', label: 'Formal Event' },
-		{ value: 'business', label: 'Business Meeting' },
-		{ value: 'party', label: 'Party Night' },
-		{ value: 'summer', label: 'Summer Vibes' },
-		{ value: 'winter', label: 'Winter Cozy' }
-	];
+	const occasions = OCCASIONS;
 
 	// Fetch items and generate initial outfits
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
+				setError(null);
 				const { items: fetchedItems } = await ItemsService.getItems({});
 				setItems(fetchedItems);
 
-				if (fetchedItems.length >= 2) {
-					const generatedOutfits = OutfitService.generateRandomOutfits(fetchedItems, 5);
+				if (fetchedItems.length >= 3) {
+					const generatedOutfits = OutfitService.generateOutfits(fetchedItems, 5);
 					setOutfits(generatedOutfits);
 				}
 			} catch (error) {
 				console.error('Error fetching items:', error);
+				setError('Failed to load your wardrobe. Please try again.');
 			} finally {
 				setLoading(false);
 			}
@@ -47,9 +43,10 @@ const OutfitGeneratorPage = () => {
 	}, []);
 
 	const generateNewOutfits = async () => {
-		if (items.length < 2) return;
+		if (items.length < 3) return;
 
 		setGenerating(true);
+		setError(null);
 
 		try {
 			// Add a small delay for better UX
@@ -58,17 +55,23 @@ const OutfitGeneratorPage = () => {
 			let generatedOutfits: Outfit[];
 
 			if (selectedOccasion) {
-				const occasionOutfit = OutfitService.generateOutfitForOccasion(items, selectedOccasion);
-				const randomOutfits = OutfitService.generateRandomOutfits(items, 4);
-				generatedOutfits = occasionOutfit ? [occasionOutfit, ...randomOutfits] : randomOutfits;
+				// Map occasion to mood for the new system
+				const moodOutfit = OutfitService.generateMoodBasedOutfit(items, selectedOccasion, []);
+				const randomOutfits = OutfitService.generateOutfits(items, 4);
+				generatedOutfits = moodOutfit ? [moodOutfit, ...randomOutfits] : randomOutfits;
 			} else {
-				generatedOutfits = OutfitService.generateRandomOutfits(items, 5);
+				generatedOutfits = OutfitService.generateOutfits(items, 5);
 			}
 
-			setOutfits(generatedOutfits);
-			setCurrentOutfitIndex(0);
+			if (generatedOutfits.length === 0) {
+				setError('Could not generate any suitable outfits. Try adding more items or different combinations to your wardrobe.');
+			} else {
+				setOutfits(generatedOutfits);
+				setCurrentOutfitIndex(0);
+			}
 		} catch (error) {
 			console.error('Error generating outfits:', error);
+			setError('Failed to generate outfits. Please try again.');
 		} finally {
 			setGenerating(false);
 		}
@@ -105,15 +108,15 @@ const OutfitGeneratorPage = () => {
 	};
 
 	const getScoreColor = (score: number): string => {
-		if (score >= 80) return 'text-green-600 bg-green-100';
-		if (score >= 60) return 'text-yellow-600 bg-yellow-100';
+		if (score >= SCORING_CONSTANTS.EXCELLENT_SCORE_THRESHOLD) return 'text-green-600 bg-green-100';
+		if (score >= SCORING_CONSTANTS.GOOD_SCORE_THRESHOLD) return 'text-yellow-600 bg-yellow-100';
 		return 'text-red-600 bg-red-100';
 	};
 
 	const getScoreLabel = (score: number): string => {
-		if (score >= 80) return 'Excellent Match';
-		if (score >= 60) return 'Good Match';
-		if (score >= 40) return 'Okay Match';
+		if (score >= SCORING_CONSTANTS.EXCELLENT_SCORE_THRESHOLD) return 'Excellent Match';
+		if (score >= SCORING_CONSTANTS.GOOD_SCORE_THRESHOLD) return 'Good Match';
+		if (score >= SCORING_CONSTANTS.OKAY_SCORE_THRESHOLD) return 'Okay Match';
 		return 'Experimental';
 	};
 
@@ -128,14 +131,32 @@ const OutfitGeneratorPage = () => {
 		);
 	}
 
-	if (items.length < 2) {
+	if (error) {
+		return (
+			<div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
+				<div className="text-center max-w-md">
+					<div className="text-6xl mb-6">⚠️</div>
+					<h1 className="text-2xl font-bold text-gray-900 mb-4">Something went wrong</h1>
+					<p className="text-gray-600 mb-6">{error}</p>
+					<button
+						onClick={() => window.location.reload()}
+						className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+					>
+						Try Again
+					</button>
+				</div>
+			</div>
+		);
+	}
+
+	if (items.length < 3) {
 		return (
 			<div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
 				<div className="text-center max-w-md">
 					<div className="text-6xl mb-6">👗</div>
 					<h1 className="text-2xl font-bold text-gray-900 mb-4">Not Enough Items</h1>
 					<p className="text-gray-600 mb-6">
-						You need at least 2 items in your closet to generate outfits.
+						You need at least 3 items in your closet to generate outfits.
 						Add more items to start creating amazing outfit combinations!
 					</p>
 					<a
@@ -224,8 +245,8 @@ const OutfitGeneratorPage = () => {
 										key={index}
 										onClick={() => setCurrentOutfitIndex(index)}
 										className={`w-3 h-3 rounded-full transition-colors ${index === currentOutfitIndex
-												? 'bg-purple-600'
-												: 'bg-gray-300 hover:bg-gray-400'
+											? 'bg-purple-600'
+											: 'bg-gray-300 hover:bg-gray-400'
 											}`}
 									/>
 								))}
@@ -241,6 +262,16 @@ const OutfitGeneratorPage = () => {
 						</div>
 					)}
 				</div>
+
+				{/* Error display for outfit generation */}
+				{error && !loading && (
+					<div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+						<div className="flex items-center space-x-2">
+							<div className="text-red-500 text-sm">⚠️</div>
+							<p className="text-red-700 text-sm">{error}</p>
+						</div>
+					</div>
+				)}
 
 				{/* Current Outfit Display */}
 				{currentOutfit ? (
@@ -294,13 +325,20 @@ const OutfitGeneratorPage = () => {
 									{/* Colors */}
 									{item.colors && item.colors.length > 0 && (
 										<div className="flex flex-wrap gap-1 mb-2">
-											{item.colors.slice(0, 2).map((color, colorIndex) => (
-												<span
+											{item.colors.slice(0, 3).map((color, colorIndex) => (
+												<div
 													key={colorIndex}
-													className="text-xs px-2 py-1 bg-white text-gray-600 rounded-full"
+													className="flex items-center space-x-1"
 												>
-													{color}
-												</span>
+													<div
+														className="w-3 h-3 rounded-full border border-gray-300"
+														style={{ backgroundColor: color }}
+														title={color}
+													/>
+													<span className="text-xs text-gray-600">
+														{color.length === 7 ? color.toUpperCase() : color}
+													</span>
+												</div>
 											))}
 										</div>
 									)}
@@ -318,12 +356,19 @@ const OutfitGeneratorPage = () => {
 								</div>
 								<div className="flex flex-wrap gap-2">
 									{currentOutfit.dominantColors.map((color, index) => (
-										<span
+										<div
 											key={index}
-											className="px-3 py-1 bg-white text-gray-700 rounded-full text-sm capitalize"
+											className="flex items-center space-x-2 px-3 py-2 bg-white rounded-full"
 										>
-											{color}
-										</span>
+											<div
+												className="w-4 h-4 rounded-full border border-gray-300"
+												style={{ backgroundColor: color }}
+												title={color}
+											/>
+											<span className="text-sm text-gray-700">
+												{color.length === 7 ? color.toUpperCase() : color}
+											</span>
+										</div>
 									))}
 								</div>
 							</div>

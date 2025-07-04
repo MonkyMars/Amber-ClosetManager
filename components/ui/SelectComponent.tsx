@@ -1,13 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { X, ChevronDown } from "lucide-react";
 
 type SelectProps = {
@@ -50,6 +43,7 @@ const SelectComponent: React.FC<SelectProps> = ({
 
 	const handleSingleSelect = (selectedValue: string) => {
 		onChange?.(selectedValue);
+		setIsOpen(false); // Close dropdown after selection
 	};
 
 	const handleMultiSelect = (selectedValue: string) => {
@@ -146,23 +140,64 @@ const SelectComponent: React.FC<SelectProps> = ({
 		);
 	}
 
+	// Single select version with consistent UX
 	return (
-		<div className="space-y-2">
+		<div className="space-y-2" ref={dropdownRef}>
 			<label className="text-sm font-medium text-gray-700" htmlFor={name}>
 				{label} {required && <span className="text-red-500">*</span>}
 			</label>
-			<Select name={name} onValueChange={handleSingleSelect} value={value as string}>
-				<SelectTrigger className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors">
-					<SelectValue placeholder={placeholder} />
-				</SelectTrigger>
-				<SelectContent>
-					{options.map((option) => (
-						<SelectItem key={option.value} value={option.value} className="hover:bg-gray-50">
-							{option.label}
-						</SelectItem>
-					))}
-				</SelectContent>
-			</Select>
+			<div className="relative">
+				<button
+					type="button"
+					onClick={() => setIsOpen(!isOpen)}
+					className="w-full px-4 py-3 text-left border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white hover:border-gray-400 transition-colors"
+				>
+					<div className="flex items-center justify-between">
+						<span className={`${typeof value === 'string' && value ? 'text-gray-900' : 'text-gray-500'}`}>
+							{getDisplayValue()}
+						</span>
+						<ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+					</div>
+				</button>
+
+				{isOpen && (
+					<div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+						{options.map((option) => {
+							const isSelected = value === option.value;
+							return (
+								<button
+									key={option.value}
+									type="button"
+									onClick={() => handleSingleSelect(option.value)}
+									className={`w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors ${isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+										}`}
+								>
+									<div className="flex items-center justify-between">
+										<span>{option.label}</span>
+										{isSelected && <span className="text-blue-600">✓</span>}
+									</div>
+								</button>
+							);
+						})}
+					</div>
+				)}
+			</div>
+
+			{/* Selected value display for single select */}
+			{typeof value === 'string' && value && (
+				<div className="mt-2">
+					<span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+						{options.find(opt => opt.value === value)?.label || value}
+						<button
+							type="button"
+							onClick={() => onChange?.('')}
+							className="ml-2 hover:text-blue-600"
+						>
+							<X className="h-3 w-3" />
+						</button>
+					</span>
+				</div>
+			)}
 		</div>
 	);
 };

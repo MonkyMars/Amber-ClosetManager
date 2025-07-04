@@ -1,8 +1,10 @@
 "use client";
 
 import SelectComponent from "@/components/ui/SelectComponent";
+import ColorPicker from "@/components/ui/ColorPicker";
 import { FormData } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
+import { ITEM_CATEGORIES, STYLE_TAGS } from "@/lib/constants";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -14,7 +16,7 @@ const New = () => {
 		name: "",
 		category: "",
 		description: "",
-		colors: "",
+		colors: [],
 		tags: [],
 		image_url: "",
 	});
@@ -90,7 +92,7 @@ const New = () => {
 				name: formData.name,
 				category: formData.category,
 				description: formData.description,
-				colors: formData.colors.split(',').map(color => color.trim()).filter(color => color !== ''),
+				colors: formData.colors,
 				tags: formData.tags,
 				image_url: imageUrl || null,
 			};
@@ -112,7 +114,7 @@ const New = () => {
 				name: "",
 				category: "",
 				description: "",
-				colors: "",
+				colors: [],
 				tags: [],
 				image_url: "",
 			});
@@ -235,22 +237,7 @@ const New = () => {
 						<SelectComponent
 							name="category"
 							label="Category"
-							multiple
-							options={[
-								{ value: "shorts", label: "Shorts" },
-								{ value: "pants", label: "Long Pants" },
-								{ value: "skirts", label: "Skirts" },
-								{ value: "tshirts", label: "T-Shirts" },
-								{ value: "sweaters", label: "Sweaters" },
-								{ value: "hoodies", label: "Hoodies" },
-								{ value: "vests", label: "Vests" },
-								{ value: "dresses", label: "Dresses" },
-								{ value: "shoes", label: "Shoes" },
-								{ value: "socks", label: "Socks" },
-								{ value: "bracelets", label: "Bracelets" },
-								{ value: "rings", label: "Rings" },
-								{ value: "necklaces", label: "Necklaces" },
-							]}
+							options={ITEM_CATEGORIES}
 							value={formData.category}
 							placeholder="Select the category that describe this item best"
 							onChange={(value) => {
@@ -279,20 +266,14 @@ const New = () => {
 
 						{/* Colors */}
 						<div className="space-y-2">
-							<label className="text-sm font-medium text-gray-700" htmlFor="colors">
+							<label className="text-sm font-medium text-gray-700">
 								Colors <span className="text-red-500">*</span>
 							</label>
-							<input
-								type="text"
-								name="colors"
-								id="colors"
-								required
-								className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-								placeholder="e.g. Red, Blue, White (separate with commas)"
-								onChange={onChange}
-								value={formData.colors}
+							<ColorPicker
+								selectedColors={formData.colors}
+								onChange={(colors) => setFormData(prev => ({ ...prev, colors }))}
+								maxColors={3}
 							/>
-							<p className="text-xs text-gray-500">Separate multiple colors with commas</p>
 						</div>
 
 						{/* Tags */}
@@ -300,23 +281,7 @@ const New = () => {
 							name="tags"
 							label="Tags"
 							multiple
-							options={[
-								{ value: "casual", label: "Casual" },
-								{ value: "formal", label: "Formal" },
-								{ value: "business", label: "Business" },
-								{ value: "party", label: "Party" },
-								{ value: "summer", label: "Summer" },
-								{ value: "winter", label: "Winter" },
-								{ value: "spring", label: "Spring" },
-								{ value: "fall", label: "Fall" },
-								{ value: "vintage", label: "Vintage" },
-								{ value: "trendy", label: "Trendy" },
-								{ value: "comfortable", label: "Comfortable" },
-								{ value: "elegant", label: "Elegant" },
-								{ value: "sporty", label: "Sporty" },
-								{ value: "bohemian", label: "Bohemian" },
-								{ value: "minimalist", label: "Minimalist" },
-							]}
+							options={STYLE_TAGS}
 							value={formData.tags}
 							placeholder="Select tags that describe this item"
 							onChange={(value) => {
@@ -332,7 +297,7 @@ const New = () => {
 					<div className="pt-6">
 						<button
 							type="submit"
-							disabled={isLoading || !formData.name || !formData.category || !formData.description || !formData.colors}
+							disabled={isLoading || !formData.name || !formData.category || !formData.description || formData.colors.length === 0}
 							className="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
 						>
 							{isLoading ? (

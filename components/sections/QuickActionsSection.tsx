@@ -35,8 +35,8 @@ const QuickActionsSection = () => {
 		{
 			title: 'Style Analytics',
 			description: 'Discover insights about your fashion preferences',
-			icon: '�',
-			gradient: 'from-orange-600 to-red-600',
+			icon: '📊',
+			gradient: 'from-orange-300 to-red-600',
 			href: '/analytics'
 		}
 	];

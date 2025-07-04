@@ -42,3 +42,9 @@ next-env.d.ts
 
 # filesort
 .filesort
+
+# sql folder at the root
+/sql
+
+# vscode settings
+.vscode
