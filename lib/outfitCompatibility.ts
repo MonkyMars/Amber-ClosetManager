@@ -7,7 +7,7 @@ import { CATEGORY_TYPE_MAP } from "./constants";
 
 export interface ClothingCategory {
   name: string;
-  type: "base" | "layer" | "outer" | "bottom" | "shoes" | "accessory";
+  type: "base" | "layer" | "outer" | "bottom" | "shoes" | "accessory" | "dress";
   subtype?: string;
   conflicts?: string[]; // Categories that conflict with this one
   maxPerOutfit: number;
