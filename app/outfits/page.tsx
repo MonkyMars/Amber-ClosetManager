@@ -101,6 +101,7 @@ const OutfitGeneratorPage = () => {
 			'bags': '🎒',
 			'jewelry': '💍',
 			'outerwear': '🧥',
+			'jackets': '🧥',
 			'underwear': '🩲',
 			'activewear': '🏃‍♀️'
 		};

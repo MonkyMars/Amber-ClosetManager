@@ -4,14 +4,20 @@
  * to ensure consistency and prevent mismatches.
  */
 
+import { Category } from "./types";
+
 // Item Categories - These are the definitive categories available in the app
-export const ITEM_CATEGORIES = [
+export const ITEM_CATEGORIES: {
+  value: string;
+  label: string;
+}[] = [
   { value: "shorts", label: "Shorts" },
   { value: "pants", label: "Long Pants" },
   { value: "skirts", label: "Skirts" },
   { value: "tshirts", label: "T-Shirts" },
   { value: "sweaters", label: "Sweaters" },
   { value: "hoodies", label: "Hoodies" },
+  { value: "jackets", label: "Jackets" },
   { value: "vests", label: "Vests" },
   { value: "dresses", label: "Dresses" },
   { value: "shoes", label: "Shoes" },
@@ -22,7 +28,10 @@ export const ITEM_CATEGORIES = [
 ];
 
 // Style Tags - Available style tags for items
-export const STYLE_TAGS = [
+export const STYLE_TAGS: {
+  value: string;
+  label: string;
+}[] = [
   { value: "casual", label: "Casual" },
   { value: "formal", label: "Formal" },
   { value: "business", label: "Business" },
@@ -41,7 +50,10 @@ export const STYLE_TAGS = [
 ];
 
 // Occasion options for outfit generation
-export const OCCASIONS = [
+export const OCCASIONS: {
+  value: string;
+  label: string;
+}[] = [
   { value: "", label: "Any Occasion" },
   { value: "casual", label: "Casual Day Out" },
   { value: "formal", label: "Formal Event" },
@@ -52,95 +64,136 @@ export const OCCASIONS = [
 ];
 
 // Category type mappings for outfit generation
-export const CATEGORY_TYPE_MAP: Record<
-  string,
-  {
-    type: "base" | "layer" | "outer" | "bottom" | "shoes" | "accessory";
-    name: string;
-    maxPerOutfit: number;
-    priority: number;
-    conflicts?: string[];
-  }
-> = {
-  // Tops
-  tshirts: { type: "base", name: "t-shirt", maxPerOutfit: 1, priority: 5 },
+export const CATEGORY_TYPE_MAP: Record<string, Category> = {
+  // Tops - Base Layer (only one base top allowed)
+  tshirts: {
+    type: "base",
+    name: "t-shirt",
+    maxPerOutfit: 1,
+    priority: 5,
+    conflicts: ["sweaters", "dresses"], // Can't wear with other base tops or dresses
+  },
   sweaters: {
     type: "base",
     name: "sweater",
     maxPerOutfit: 1,
     priority: 6,
-    conflicts: ["hoodies"],
+    conflicts: ["tshirts", "hoodies", "dresses"], // Can't wear with other base tops, hoodies, or dresses
   },
+
+  // Tops - Layer (can layer over base, but only one layer type)
   hoodies: {
     type: "layer",
     name: "hoodie",
     maxPerOutfit: 1,
     priority: 5,
-    conflicts: ["vests", "sweaters"],
+    conflicts: ["sweaters", "vests", "jackets", "dresses"], // Can't wear with sweaters, other layers, or dresses
+    requires: ["tshirts"], // Should have a base layer underneath
   },
   vests: {
     type: "layer",
     name: "vest",
     maxPerOutfit: 1,
     priority: 4,
-    conflicts: ["hoodies"],
+    requires: ["tshirts"], // Should have a base layer underneath
+    conflicts: ["hoodies", "jackets", "dresses"], // Can't wear with other layers or dresses
   },
 
-  // Bottoms
+  // Tops - Outer Layer (can go over everything, but only one outer)
+  jackets: {
+    type: "outer",
+    name: "jacket",
+    maxPerOutfit: 1,
+    priority: 6,
+    conflicts: ["hoodies", "vests", "dresses"], // Can't wear with layers that would be bulky underneath, or dresses
+  },
+
+  // Bottoms (only one bottom type allowed, all conflict with each other)
   shorts: {
     type: "bottom",
     name: "shorts",
     maxPerOutfit: 1,
     priority: 4,
-    conflicts: ["pants", "skirts"],
+    conflicts: ["pants", "skirts", "dresses"], // Can't wear multiple bottoms or with dresses
   },
   pants: {
     type: "bottom",
     name: "pants",
     maxPerOutfit: 1,
     priority: 6,
-    conflicts: ["shorts", "skirts"],
+    conflicts: ["shorts", "skirts", "dresses"], // Can't wear multiple bottoms or with dresses
   },
   skirts: {
     type: "bottom",
     name: "skirt",
     maxPerOutfit: 1,
     priority: 5,
-    conflicts: ["shorts", "pants"],
+    conflicts: ["shorts", "pants", "dresses"], // Can't wear multiple bottoms or with dresses
   },
 
-  // Dresses (replace both top and bottom)
+  // Dresses (replaces both tops and bottoms - conflicts with everything except accessories, shoes, and outer layers)
   dresses: {
-    type: "base",
+    type: "dress",
     name: "dress",
     maxPerOutfit: 1,
     priority: 8,
-    conflicts: ["shorts", "pants", "skirts", "tshirts", "sweaters"],
+    conflicts: [
+      "shorts",
+      "pants",
+      "skirts", // No bottoms with dresses
+      "tshirts",
+      "sweaters",
+      "hoodies",
+      "vests", // No tops under dresses (jackets ok for layering)
+    ],
   },
 
-  // Footwear
-  shoes: { type: "shoes", name: "shoes", maxPerOutfit: 1, priority: 5 },
-  socks: { type: "accessory", name: "socks", maxPerOutfit: 1, priority: 2 },
+  // Footwear (required, only one pair of shoes)
+  shoes: {
+    type: "shoes",
+    name: "shoes",
+    maxPerOutfit: 1,
+    priority: 5,
+    requires: ["socks"], // Should have socks with shoes
+    conflicts: [], // Shoes go with everything
+  },
+  socks: {
+    type: "accessory",
+    name: "socks",
+    maxPerOutfit: 1,
+    priority: 2,
+    conflicts: [], // Socks go with everything
+  },
 
-  // Accessories
+  // Accessories (multiple allowed, no major conflicts)
   bracelets: {
     type: "accessory",
     name: "bracelet",
     maxPerOutfit: 2,
     priority: 2,
+    conflicts: [], // Accessories generally don't conflict
   },
-  rings: { type: "accessory", name: "ring", maxPerOutfit: 4, priority: 2 },
+  rings: {
+    type: "accessory",
+    name: "ring",
+    maxPerOutfit: 4,
+    priority: 2,
+    conflicts: [], // Accessories generally don't conflict
+  },
   necklaces: {
     type: "accessory",
     name: "necklace",
     maxPerOutfit: 2,
     priority: 3,
+    conflicts: [], // Accessories generally don't conflict
   },
 };
 
 // Category groups for easy filtering
-export const CATEGORY_GROUPS = {
-  TOPS: ["tshirts", "sweaters", "hoodies", "vests"],
+export const CATEGORY_GROUPS: {
+  [key: string]: string[];
+} = {
+  TOPS: ["tshirts", "sweaters", "hoodies", "jackets", "vests"],
   BOTTOMS: ["shorts", "pants", "skirts"],
   DRESSES: ["dresses"],
   FOOTWEAR: ["shoes", "socks"],
@@ -148,7 +201,11 @@ export const CATEGORY_GROUPS = {
 } as const;
 
 // Color system constants
-export const COLOR_CONSTANTS = {
+export const COLOR_CONSTANTS: {
+  MAX_COLORS_PER_ITEM: number;
+  MIN_COLORS_PER_ITEM: number;
+  PRESET_COLORS: string[];
+} = {
   MAX_COLORS_PER_ITEM: 3,
   MIN_COLORS_PER_ITEM: 1,
   PRESET_COLORS: [
@@ -180,6 +237,25 @@ export const OUTFIT_CONSTANTS = {
   OUTERWEAR_CHANCE: 0.4, // 40% chance to add outerwear
   DRESS_FOUNDATION_CHANCE: 0.3, // 30% chance to build around dress
   ACCESSORY_RANGE: { min: 1, max: 3 },
+
+  // Outfit composition rules
+  REQUIRED_COMPONENTS: {
+    // Either dress OR (top + bottom) + shoes
+    DRESS_OUTFIT: ["dresses", "shoes"],
+    STANDARD_OUTFIT: {
+      REQUIRED: ["shoes"], // Always need shoes
+      ONE_OF_TOPS: ["tshirts", "sweaters"], // Need at least one base top
+      ONE_OF_BOTTOMS: ["shorts", "pants", "skirts"], // Need at least one bottom
+    },
+  },
+
+  // Layering rules (what can go together)
+  LAYERING_RULES: {
+    BASE_LAYER: ["tshirts"], // Foundation layer
+    OVER_BASE: ["hoodies", "vests"], // Can go over base layer
+    OVER_LAYER: ["jackets"], // Can go over layer
+    WITH_DRESS: ["jackets"], // Only jackets can be worn over dresses
+  },
 } as const;
 
 // Score thresholds and weights
@@ -208,3 +284,88 @@ export type ItemCategory = (typeof ITEM_CATEGORIES)[number]["value"];
 export type StyleTag = (typeof STYLE_TAGS)[number]["value"];
 export type Occasion = (typeof OCCASIONS)[number]["value"];
 export type CategoryGroup = keyof typeof CATEGORY_GROUPS;
+export type ClothingType =
+  | "base"
+  | "layer"
+  | "outer"
+  | "bottom"
+  | "shoes"
+  | "accessory"
+  | "dress";
+
+// Helper functions for outfit validation
+export const OUTFIT_VALIDATION = {
+  /**
+   * Check if two categories conflict with each other
+   */
+  hasConflict: (category1: ItemCategory, category2: ItemCategory): boolean => {
+    const config1 = CATEGORY_TYPE_MAP[category1];
+    const config2 = CATEGORY_TYPE_MAP[category2];
+
+    return (
+      config1?.conflicts?.includes(category2) ||
+      config2?.conflicts?.includes(category1) ||
+      false
+    );
+  },
+
+  /**
+   * Check if an outfit composition is valid
+   */
+  isValidOutfit: (categories: ItemCategory[]): boolean => {
+    // Check for conflicts
+    for (let i = 0; i < categories.length; i++) {
+      for (let j = i + 1; j < categories.length; j++) {
+        if (OUTFIT_VALIDATION.hasConflict(categories[i], categories[j])) {
+          return false;
+        }
+      }
+    }
+
+    // Check minimum requirements
+    const hasDress = categories.includes("dresses");
+    const hasShoes = categories.includes("shoes");
+
+    if (hasDress) {
+      // Dress outfit: just needs shoes
+      return hasShoes;
+    } else {
+      // Standard outfit: needs top + bottom + shoes
+      const hasTop = categories.some((cat) =>
+        ["tshirts", "sweaters", "hoodies", "vests"].includes(cat)
+      );
+      const hasBottom = categories.some((cat) =>
+        ["shorts", "pants", "skirts"].includes(cat)
+      );
+
+      return hasTop && hasBottom && hasShoes;
+    }
+  },
+
+  /**
+   * Get recommended additions for an incomplete outfit
+   */
+  getRecommendedAdditions: (categories: ItemCategory[]): ItemCategory[] => {
+    const recommendations: ItemCategory[] = [];
+
+    const hasDress = categories.includes("dresses");
+    const hasShoes = categories.includes("shoes");
+
+    if (hasDress) {
+      if (!hasShoes) recommendations.push("shoes");
+    } else {
+      const hasBaseTop = categories.some((cat) =>
+        ["tshirts", "sweaters"].includes(cat)
+      );
+      const hasBottom = categories.some((cat) =>
+        ["shorts", "pants", "skirts"].includes(cat)
+      );
+
+      if (!hasBaseTop) recommendations.push("tshirts");
+      if (!hasBottom) recommendations.push("pants");
+      if (!hasShoes) recommendations.push("shoes");
+    }
+
+    return recommendations;
+  },
+} as const;

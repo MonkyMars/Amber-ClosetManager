@@ -62,3 +62,21 @@ export interface MoodStats {
   mostUsedColors: string[];
   recentMoods: number;
 }
+
+export type CategoryType =
+  | "base"
+  | "layer"
+  | "outer"
+  | "bottom"
+  | "shoes"
+  | "accessory"
+  | "dress";
+
+export interface Category {
+  type: CategoryType;
+  name: string;
+  maxPerOutfit: number;
+  priority: number;
+  conflicts?: string[];
+  requires?: string[];
+}
