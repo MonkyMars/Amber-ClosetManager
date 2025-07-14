@@ -149,7 +149,22 @@ export class ColorCompatibilityEngine {
       score += 15;
     }
 
-    // Rule 9: Avoid clashing brights
+    // Rule 9: Red and Purple incompatibility
+    // Red: hue 0-30 and 330-360, Purple: hue 270-330
+    const isRed1 =
+      (profile1.hsl.h <= 30 || profile1.hsl.h >= 330) && profile1.hsl.s > 30;
+    const isPurple1 =
+      profile1.hsl.h >= 270 && profile1.hsl.h <= 330 && profile1.hsl.s > 30;
+    const isRed2 =
+      (profile2.hsl.h <= 30 || profile2.hsl.h >= 330) && profile2.hsl.s > 30;
+    const isPurple2 =
+      profile2.hsl.h >= 270 && profile2.hsl.h <= 330 && profile2.hsl.s > 30;
+
+    if ((isRed1 && isPurple2) || (isPurple1 && isRed2)) {
+      score -= 40; // Strong penalty for red-purple combinations
+    }
+
+    // Rule 10: Avoid clashing brights
     if (
       profile1.category === "bright" &&
       profile2.category === "bright" &&
@@ -159,7 +174,7 @@ export class ColorCompatibilityEngine {
       score -= 30;
     }
 
-    // Rule 10: Classic combinations
+    // Rule 11: Classic combinations
     const classicCombos = [
       ["#000000", "#FFFFFF"], // black & white
       ["#000080", "#FFFFFF"], // navy & white

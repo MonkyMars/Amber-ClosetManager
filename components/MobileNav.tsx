@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Plus, Search, Sparkles, Palette } from "lucide-react";
+import { Home, Plus, Search, Sparkles, Shirt } from "lucide-react";
 
 const MobileNav = () => {
 	const pathname = usePathname();
@@ -10,9 +10,9 @@ const MobileNav = () => {
 	const navItems = [
 		{ href: '/', label: 'Home', icon: Home },
 		{ href: '/browse', label: 'Browse', icon: Search },
-		{ href: '/moods', label: 'Moods', icon: Palette },
-		{ href: '/new', label: 'Add', icon: Plus },
 		{ href: '/outfits', label: 'Outfits', icon: Sparkles },
+		{ href: '/closet', label: 'Closet', icon: Shirt },
+		{ href: '/new', label: 'Add', icon: Plus },
 	];
 
 	const isActive = (href: string) => {
@@ -31,8 +31,8 @@ const MobileNav = () => {
 							key={item.href}
 							href={item.href}
 							className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-colors ${active
-									? 'text-blue-600'
-									: 'text-gray-500 hover:text-gray-700'
+								? 'text-blue-600'
+								: 'text-gray-500 hover:text-gray-700'
 								}`}
 						>
 							<Icon className={`h-5 w-5 ${active ? 'text-blue-600' : ''}`} />

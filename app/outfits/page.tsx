@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { ItemsService } from '@/lib/itemsService';
 import { OutfitService, Outfit } from '@/lib/outfitService';
+import { SavedOutfitService } from '@/lib/savedOutfitService';
 import { Item } from '@/lib/types';
 import { OCCASIONS, SCORING_CONSTANTS } from '@/lib/constants';
-import { Shuffle, Sparkles, Heart, RefreshCw, Palette, Tag } from 'lucide-react';
+import { Shuffle, Sparkles, Heart, RefreshCw, Palette, Tag, Check, X, Grid, List } from 'lucide-react';
 import Image from 'next/image';
 
 const OutfitGeneratorPage = () => {
@@ -16,6 +17,10 @@ const OutfitGeneratorPage = () => {
 	const [generating, setGenerating] = useState(false);
 	const [selectedOccasion, setSelectedOccasion] = useState('');
 	const [error, setError] = useState<string | null>(null);
+	const [savingOutfit, setSavingOutfit] = useState(false);
+	const [saveSuccess, setSaveSuccess] = useState(false);
+	const [savedOutfitIds, setSavedOutfitIds] = useState<Set<string>>(new Set());
+	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
 	const occasions = OCCASIONS;
 
@@ -24,8 +29,21 @@ const OutfitGeneratorPage = () => {
 		const fetchData = async () => {
 			try {
 				setError(null);
-				const { items: fetchedItems } = await ItemsService.getItems({});
+				const [{ items: fetchedItems }, savedOutfits] = await Promise.all([
+					ItemsService.getItems({}),
+					SavedOutfitService.getSavedOutfits()
+				]);
 				setItems(fetchedItems);
+
+				// Track already saved outfit combinations
+				const savedIds = new Set<string>();
+				savedOutfits.forEach(outfit => {
+					if (outfit.item_ids) {
+						const outfitId = outfit.item_ids.sort().join('-');
+						savedIds.add(outfitId);
+					}
+				});
+				setSavedOutfitIds(savedIds);
 
 				if (fetchedItems.length >= 3) {
 					const generatedOutfits = OutfitService.generateOutfits(fetchedItems, 5);
@@ -47,6 +65,7 @@ const OutfitGeneratorPage = () => {
 
 		setGenerating(true);
 		setError(null);
+		setSaveSuccess(false); // Clear save success banner when generating new outfits
 
 		try {
 			// Add a small delay for better UX
@@ -57,7 +76,7 @@ const OutfitGeneratorPage = () => {
 			if (selectedOccasion) {
 				// Map occasion to mood for the new system
 				const moodOutfit = OutfitService.generateMoodBasedOutfit(items, selectedOccasion, []);
-				const randomOutfits = OutfitService.generateOutfits(items, 4);
+				const randomOutfits = OutfitService.generateOutfits(items, 4, selectedOccasion);
 				generatedOutfits = moodOutfit ? [moodOutfit, ...randomOutfits] : randomOutfits;
 			} else {
 				generatedOutfits = OutfitService.generateOutfits(items, 5);
@@ -83,13 +102,59 @@ const OutfitGeneratorPage = () => {
 
 	const nextOutfit = () => {
 		if (outfits.length > 0) {
+			setSaveSuccess(false); // Clear save success banner when changing outfits
 			setCurrentOutfitIndex((prev) => (prev + 1) % outfits.length);
 		}
 	};
 
 	const prevOutfit = () => {
 		if (outfits.length > 0) {
+			setSaveSuccess(false); // Clear save success banner when changing outfits
 			setCurrentOutfitIndex((prev) => (prev - 1 + outfits.length) % outfits.length);
+		}
+	};
+
+	const saveCurrentOutfit = async () => {
+		const currentOutfit = getCurrentOutfit();
+		if (!currentOutfit) return;
+
+		setSavingOutfit(true);
+		try {
+			const savedOutfit = await SavedOutfitService.saveOutfit(currentOutfit);
+			if (savedOutfit) {
+				setSaveSuccess(true);
+				// Create a unique identifier for this outfit combination
+				const outfitId = currentOutfit.items.map(item => item.id).sort().join('-');
+				setSavedOutfitIds(prev => new Set(prev).add(outfitId));
+				setTimeout(() => setSaveSuccess(false), 3000); // Show success for 3 seconds
+			}
+		} catch (error) {
+			console.error('Error saving outfit:', error);
+			setError('Failed to save outfit. Please try again.');
+		} finally {
+			setSavingOutfit(false);
+		}
+	};
+
+	// Check if current outfit is already saved
+	const isCurrentOutfitSaved = (): boolean => {
+		const currentOutfit = getCurrentOutfit();
+		if (!currentOutfit) return false;
+		const outfitId = currentOutfit.items.map(item => item.id).sort().join('-');
+		return savedOutfitIds.has(outfitId);
+	};
+
+	const discardCurrentOutfit = () => {
+		if (outfits.length <= 1) {
+			// If this is the last outfit, generate new ones
+			generateNewOutfits();
+		} else {
+			// Remove current outfit and move to next
+			const newOutfits = outfits.filter((_, index) => index !== currentOutfitIndex);
+			setOutfits(newOutfits);
+			if (currentOutfitIndex >= newOutfits.length) {
+				setCurrentOutfitIndex(newOutfits.length - 1);
+			}
 		}
 	};
 
@@ -213,6 +278,30 @@ const OutfitGeneratorPage = () => {
 							</select>
 						</div>
 
+						{/* View Mode Toggle */}
+						<div className="flex items-center bg-background border border-border rounded-lg p-1 shadow-sm">
+							<button
+								onClick={() => setViewMode('grid')}
+								className={`p-2 rounded transition-all ${viewMode === 'grid'
+									? 'bg-gradient-to-r from-primary to-accent text-foreground shadow-lg'
+									: 'text-foreground/50 hover:text-foreground'
+									}`}
+								title="Grid view"
+							>
+								<Grid className="h-4 w-4" />
+							</button>
+							<button
+								onClick={() => setViewMode('list')}
+								className={`p-2 rounded transition-all ${viewMode === 'list'
+									? 'bg-gradient-to-r from-primary to-accent text-foreground shadow-lg'
+									: 'text-foreground/50 hover:text-foreground'
+									}`}
+								title="List view"
+							>
+								<List className="h-4 w-4" />
+							</button>
+						</div>
+
 						<div className="flex items-end space-x-3">
 							<button
 								onClick={generateNewOutfits}
@@ -244,7 +333,10 @@ const OutfitGeneratorPage = () => {
 								{outfits.map((_, index) => (
 									<button
 										key={index}
-										onClick={() => setCurrentOutfitIndex(index)}
+										onClick={() => {
+											setSaveSuccess(false); // Clear save success banner when changing outfits
+											setCurrentOutfitIndex(index);
+										}}
 										className={`w-3 h-3 rounded-full transition-colors ${index === currentOutfitIndex
 											? 'bg-primary'
 											: 'bg-border hover:bg-secondary'
@@ -292,57 +384,123 @@ const OutfitGeneratorPage = () => {
 								</div>
 							</div>
 
-							<div className="mt-4 md:mt-0">
-								<button className="flex items-center space-x-2 px-4 py-2 border border-border rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors">
-									<Heart className="h-4 w-4" />
-									<span>Save Outfit</span>
+							<div className="mt-4 md:mt-0 flex space-x-3">
+								{saveSuccess && (
+									<div className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg">
+										<Check className="h-4 w-4" />
+										<span>Saved!</span>
+									</div>
+								)}
+
+								<button
+									onClick={discardCurrentOutfit}
+									className="flex items-center space-x-2 px-4 py-2 border border-red-200 text-red-600 rounded-lg bg-red-50 hover:bg-red-100 transition-colors"
+								>
+									<X className="h-4 w-4" />
+									<span>Discard</span>
+								</button>
+
+								<button
+									onClick={saveCurrentOutfit}
+									disabled={savingOutfit || isCurrentOutfitSaved()}
+									className={`flex items-center space-x-2 px-4 py-2 border rounded-lg transition-colors ${isCurrentOutfitSaved()
+											? 'border-green-300 bg-green-50 text-green-700 cursor-not-allowed'
+											: 'border-border bg-secondary/30 hover:bg-secondary/50'
+										}`}
+								>
+									{savingOutfit ? (
+										<RefreshCw className="h-4 w-4 animate-spin" />
+									) : isCurrentOutfitSaved() ? (
+										<Check className="h-4 w-4" />
+									) : (
+										<Heart className="h-4 w-4" />
+									)}
+									<span>
+										{savingOutfit ? 'Saving...' : isCurrentOutfitSaved() ? 'Already Saved' : 'Save Outfit'}
+									</span>
 								</button>
 							</div>
 						</div>
 
 						{/* Outfit Items */}
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+						<div className={`mb-8 ${viewMode === 'grid'
+								? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+								: 'space-y-4'
+							}`}>
 							{currentOutfit.items.map((item, index) => (
-								<div key={`${item.id}-${index}`} className="bg-secondary/20 rounded-lg p-4">
-									<div className="w-full h-32 bg-gradient-to-br from-secondary/30 to-primary/20 rounded-lg flex items-center justify-center overflow-hidden mb-3">
+								<div
+									key={`${item.id}-${index}`}
+									className={`bg-secondary/20 rounded-lg p-4 ${viewMode === 'list' ? 'flex items-center space-x-4' : ''
+										}`}
+								>
+									<div className={`bg-gradient-to-br from-secondary/30 to-primary/20 rounded-lg flex items-center justify-center overflow-hidden ${viewMode === 'list' ? 'w-24 h-24 flex-shrink-0' : 'w-full h-48 mb-3'
+										}`}>
 										{item.image_url ? (
 											<Image
 												src={item.image_url}
 												alt={item.name}
-												width={128}
-												height={128}
+												width={viewMode === 'list' ? 96 : 300}
+												height={viewMode === 'list' ? 96 : 300}
 												className="w-full h-full object-cover"
 											/>
 										) : (
-											<span className="text-2xl opacity-60">
+											<span className={`opacity-60 ${viewMode === 'list' ? 'text-2xl' : 'text-3xl'}`}>
 												{getCategoryEmoji(item.category)}
 											</span>
 										)}
 									</div>
 
-									<h3 className="font-semibold text-foreground text-sm mb-1">{item.name}</h3>
-									<p className="text-xs text-foreground opacity-60 capitalize mb-2">{item.category}</p>
+									<div className={viewMode === 'list' ? 'flex-1' : ''}>
+										<h3 className="font-semibold text-foreground text-sm mb-1">{item.name}</h3>
+										<p className="text-xs text-foreground opacity-60 capitalize mb-2">{item.category}</p>
 
-									{/* Colors */}
-									{item.colors && item.colors.length > 0 && (
-										<div className="flex flex-wrap gap-1 mb-2">
-											{item.colors.slice(0, 3).map((color, colorIndex) => (
-												<div
-													key={colorIndex}
-													className="flex items-center space-x-1"
-												>
+										{/* Colors */}
+										{item.colors && item.colors.length > 0 && (
+											<div className="flex flex-wrap gap-1 mb-2">
+												{item.colors.slice(0, viewMode === 'list' ? 2 : 3).map((color, colorIndex) => (
 													<div
-														className="w-3 h-3 rounded-full border border-border"
-														style={{ backgroundColor: color }}
-														title={color}
-													/>
+														key={colorIndex}
+														className="flex items-center space-x-1"
+													>
+														<div
+															className="w-3 h-3 rounded-full border border-border"
+															style={{ backgroundColor: color }}
+															title={color}
+														/>
+														{viewMode === 'grid' && (
+															<span className="text-xs text-foreground opacity-60">
+																{color.length === 7 ? color.toUpperCase() : color}
+															</span>
+														)}
+													</div>
+												))}
+												{item.colors.length > (viewMode === 'list' ? 2 : 3) && (
 													<span className="text-xs text-foreground opacity-60">
-														{color.length === 7 ? color.toUpperCase() : color}
+														+{item.colors.length - (viewMode === 'list' ? 2 : 3)} more
 													</span>
-												</div>
-											))}
-										</div>
-									)}
+												)}
+											</div>
+										)}
+
+										{/* Tags - only show in grid view or first 2 in list view */}
+										{item.tags && item.tags.length > 0 && (
+											<div className="flex flex-wrap gap-1">
+												{item.tags.slice(0, viewMode === 'list' ? 2 : 3).map((tag, tagIndex) => (
+													<span
+														key={tagIndex}
+														className="text-xs px-2 py-1 bg-primary/20 text-foreground rounded-full capitalize"
+													>
+														{tag}
+													</span>
+												))}
+												{item.tags.length > (viewMode === 'list' ? 2 : 3) && (
+													<span className="text-xs px-2 py-1 bg-border text-foreground opacity-60 rounded-full">
+														+{item.tags.length - (viewMode === 'list' ? 2 : 3)}
+													</span>
+												)}
+											</div>
+										)}
+									</div>
 								</div>
 							))}
 						</div>
