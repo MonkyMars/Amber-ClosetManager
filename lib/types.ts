@@ -80,3 +80,23 @@ export interface Category {
   conflicts?: string[];
   requires?: string[];
 }
+
+export interface SavedOutfit {
+  id: string;
+  outfit_items: string[]; // Array of item IDs
+  outfit_data: {
+    id: string;
+    items: Item[];
+    vibe: string;
+    dominantColors: string[];
+    tags: string[];
+    score: number;
+    colorHarmony: number;
+    completeness: number;
+    styleCoherence: number;
+  }; // Full outfit object
+  user_rating?: number; // Optional user rating 1-5
+  notes?: string; // Optional user notes
+  created_at: string;
+  updated_at: string;
+}

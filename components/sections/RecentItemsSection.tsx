@@ -110,17 +110,17 @@ const RecentItemsSection = () => {
 						<Card key={item.id} hover className="group">
 							<div className="space-y-3">
 								{/* Item image or placeholder */}
-								<div className="w-full h-32 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200 overflow-hidden">
+								<div className="w-full h-40 bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200 overflow-hidden">
 									{item.image_url ? (
 										<Image
 											src={item.image_url}
 											alt={item.name}
-											width={128}
-											height={128}
+											width={250}
+											height={250}
 											className="w-full h-full object-cover"
 										/>
 									) : (
-										<span className="text-3xl opacity-60">
+										<span className="text-4xl opacity-60">
 											{getCategoryEmoji(item.category)}
 										</span>
 									)}

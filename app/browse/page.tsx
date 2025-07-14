@@ -163,31 +163,40 @@ const BrowsePage = () => {
 				{/* Header */}
 				<div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
 					<div>
-						<h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-							Browse Your Closet
+						<div className="mb-4">
+							<div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary to-accent px-4 py-2 rounded-full text-sm font-medium text-foreground mb-4">
+								<span>🔍</span>
+								<span>Explore Your Collection</span>
+							</div>
+						</div>
+						<h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+							Browse Your
+							<span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+								Closet
+							</span>
 						</h1>
-						<p className="text-gray-600">
+						<p className="text-foreground opacity-70">
 							{filteredItems.length} of {items.length} items
 						</p>
 					</div>
 
 					{/* View Mode Toggle */}
 					<div className="flex items-center space-x-4 mt-4 md:mt-0">
-						<div className="flex items-center bg-white rounded-lg p-1 shadow-sm">
+						<div className="flex items-center bg-background border border-border rounded-lg p-1 shadow-sm">
 							<button
 								onClick={() => setViewMode('grid')}
-								className={`p-2 rounded ${viewMode === 'grid'
-									? 'bg-blue-100 text-blue-600'
-									: 'text-gray-400 hover:text-gray-600'
+								className={`p-2 rounded transition-all ${viewMode === 'grid'
+									? 'bg-gradient-to-r from-primary to-accent text-foreground shadow-lg'
+									: 'text-foreground/50 hover:text-foreground'
 									}`}
 							>
 								<Grid className="h-5 w-5" />
 							</button>
 							<button
 								onClick={() => setViewMode('list')}
-								className={`p-2 rounded ${viewMode === 'list'
-									? 'bg-blue-100 text-blue-600'
-									: 'text-gray-400 hover:text-gray-600'
+								className={`p-2 rounded transition-all ${viewMode === 'list'
+									? 'bg-gradient-to-r from-primary to-accent text-foreground shadow-lg'
+									: 'text-foreground/50 hover:text-foreground'
 									}`}
 							>
 								<List className="h-5 w-5" />
@@ -197,16 +206,16 @@ const BrowsePage = () => {
 				</div>
 
 				{/* Search and Filters */}
-				<div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+				<div className="bg-background border border-border rounded-lg shadow-sm p-6 mb-8">
 					{/* Search Bar */}
 					<div className="relative mb-4">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50 h-5 w-5" />
 						<input
 							type="text"
 							placeholder="Search items by name, category, tags, or colors..."
 							value={filters.search}
 							onChange={(e) => handleFilterChange('search', e.target.value)}
-							className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+							className="w-full pl-10 pr-4 py-3 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
 						/>
 					</div>
 
@@ -214,7 +223,7 @@ const BrowsePage = () => {
 					<div className="flex items-center justify-between">
 						<button
 							onClick={() => setShowFilters(!showFilters)}
-							className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+							className="flex items-center space-x-2 text-foreground hover:text-foreground/80 transition-colors"
 						>
 							<Filter className="h-5 w-5" />
 							<span>Filters</span>
@@ -225,7 +234,7 @@ const BrowsePage = () => {
 							<select
 								value={sortBy}
 								onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-								className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+								className="px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
 							>
 								<option value="created_at">Date Added</option>
 								<option value="name">Name</option>
@@ -234,7 +243,7 @@ const BrowsePage = () => {
 
 							<button
 								onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-								className="p-2 text-gray-400 hover:text-gray-600"
+								className="p-2 text-foreground/50 hover:text-foreground transition-colors"
 							>
 								{sortOrder === 'asc' ? <SortAsc className="h-5 w-5" /> : <SortDesc className="h-5 w-5" />}
 							</button>
@@ -243,7 +252,7 @@ const BrowsePage = () => {
 
 					{/* Filters */}
 					{showFilters && (
-						<div className="mt-6 pt-6 border-t border-gray-200">
+						<div className="mt-6 pt-6 border-t border-border">
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								<SelectComponent
 									name="category"
@@ -266,10 +275,10 @@ const BrowsePage = () => {
 
 								{/* Custom Color Filter */}
 								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-2">
+									<label className="block text-sm font-medium text-foreground mb-2">
 										Colors
 									</label>
-									<div className="border border-gray-300 rounded-lg p-3 bg-white">
+									<div className="border border-border rounded-lg p-3 bg-background">
 										<div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
 											{filterOptions.colors.map((color) => (
 												<button
@@ -281,13 +290,13 @@ const BrowsePage = () => {
 														handleFilterChange('colors', newColors);
 													}}
 													className={`flex items-center space-x-1 px-2 py-1 rounded-full border transition-colors ${filters.colors.includes(color)
-														? 'border-blue-500 bg-blue-50'
-														: 'border-gray-300 hover:border-gray-400'
+														? 'border-primary bg-primary/20'
+														: 'border-border hover:border-primary/50'
 														}`}
 													title={color}
 												>
 													<div
-														className="w-3 h-3 rounded-full border border-gray-400"
+														className="w-3 h-3 rounded-full border border-border"
 														style={{ backgroundColor: color }}
 													/>
 													<span className="text-xs">
@@ -297,7 +306,7 @@ const BrowsePage = () => {
 											))}
 										</div>
 										{filterOptions.colors.length === 0 && (
-											<p className="text-sm text-gray-500">No colors available</p>
+											<p className="text-sm text-foreground opacity-50">No colors available</p>
 										)}
 									</div>
 								</div>
@@ -306,7 +315,7 @@ const BrowsePage = () => {
 							<div className="mt-4 flex justify-end">
 								<button
 									onClick={clearFilters}
-									className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm"
+									className="px-4 py-2 text-foreground/70 hover:text-foreground text-sm transition-colors"
 								>
 									Clear all filters
 								</button>
@@ -317,7 +326,7 @@ const BrowsePage = () => {
 
 				{/* Items Grid/List */}
 				{filteredItems.length === 0 ? (
-					<div className="text-center py-12 text-gray-500">
+					<div className="text-center py-12 text-foreground opacity-70">
 						<div className="text-4xl mb-4">🔍</div>
 						<p className="text-lg font-medium mb-2">No items found</p>
 						<p className="text-sm">Try adjusting your search or filters</p>
@@ -331,22 +340,22 @@ const BrowsePage = () => {
 						{filteredItems.map((item) => (
 							<div
 								key={item.id}
-								className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow ${viewMode === 'list' ? 'p-4 flex items-center space-x-4' : 'p-4'
+								className={`bg-background border border-border rounded-lg shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-200 ${viewMode === 'list' ? 'p-4 flex items-center space-x-4' : 'p-4'
 									}`}
 							>
 								{/* Image */}
-								<div className={`${viewMode === 'list' ? 'w-16 h-16' : 'w-full h-48'
+								<div className={`${viewMode === 'list' ? 'w-24 h-24' : 'w-full h-64'
 									} bg-gradient-to-br from-secondary to-primary rounded-lg flex items-center justify-center overflow-hidden mb-4`}>
 									{item.image_url ? (
 										<Image
 											src={item.image_url}
 											alt={item.name}
-											width={viewMode === 'list' ? 64 : 192}
-											height={viewMode === 'list' ? 64 : 192}
+											width={viewMode === 'list' ? 96 : 400}
+											height={viewMode === 'list' ? 96 : 400}
 											className="w-full h-full object-cover"
 										/>
 									) : (
-										<span className={`${viewMode === 'list' ? 'text-xl' : 'text-4xl'} opacity-60`}>
+										<span className={`${viewMode === 'list' ? 'text-2xl' : 'text-5xl'} opacity-60`}>
 											{getCategoryEmoji(item.category)}
 										</span>
 									)}
@@ -354,11 +363,11 @@ const BrowsePage = () => {
 
 								{/* Content */}
 								<div className={viewMode === 'list' ? 'flex-1' : ''}>
-									<h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
-									<p className="text-sm text-gray-600 capitalize mb-2">{item.category}</p>
+									<h3 className="font-semibold text-foreground mb-1">{item.name}</h3>
+									<p className="text-sm text-foreground opacity-70 capitalize mb-2">{item.category}</p>
 
 									{viewMode === 'grid' && (
-										<p className="text-xs text-gray-500 mb-3 line-clamp-2">{item.description}</p>
+										<p className="text-xs text-foreground opacity-60 mb-3 line-clamp-2">{item.description}</p>
 									)}
 
 									{/* Colors */}
@@ -367,20 +376,20 @@ const BrowsePage = () => {
 											{item.colors.slice(0, 3).map((color, index) => (
 												<div
 													key={index}
-													className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-full"
+													className="flex items-center space-x-1 px-2 py-1 bg-secondary/50 rounded-full"
 												>
 													<div
-														className="w-3 h-3 rounded-full border border-gray-300"
+														className="w-3 h-3 rounded-full border border-border"
 														style={{ backgroundColor: color }}
 														title={color}
 													/>
-													<span className="text-xs text-gray-600">
+													<span className="text-xs text-foreground opacity-70">
 														{color.length === 7 ? color.toUpperCase() : color}
 													</span>
 												</div>
 											))}
 											{item.colors.length > 3 && (
-												<span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+												<span className="text-xs px-2 py-1 bg-secondary/50 text-foreground opacity-60 rounded-full">
 													+{item.colors.length - 3} more
 												</span>
 											)}
@@ -393,20 +402,20 @@ const BrowsePage = () => {
 											{item.tags.slice(0, 2).map((tag, index) => (
 												<span
 													key={index}
-													className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded-full"
+													className="text-xs px-2 py-1 bg-highlight/20 text-highlight rounded-full"
 												>
 													{tag}
 												</span>
 											))}
 											{item.tags.length > 2 && (
-												<span className="text-xs px-2 py-1 bg-blue-100 text-blue-500 rounded-full">
+												<span className="text-xs px-2 py-1 bg-highlight/20 text-highlight rounded-full">
 													+{item.tags.length - 2}
 												</span>
 											)}
 										</div>
 									)}
 
-									<p className="text-xs text-gray-400">
+									<p className="text-xs text-foreground opacity-50">
 										Added {item.created_at ? formatDate(item.created_at) : 'Unknown date'}
 									</p>
 								</div>

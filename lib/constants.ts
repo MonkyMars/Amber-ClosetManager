@@ -15,12 +15,19 @@ export const ITEM_CATEGORIES: {
   { value: "pants", label: "Long Pants" },
   { value: "skirts", label: "Skirts" },
   { value: "tshirts", label: "T-Shirts" },
+  { value: "tops", label: "Tops" }, // Tank tops, crop tops, blouses, etc.
   { value: "sweaters", label: "Sweaters" },
   { value: "hoodies", label: "Hoodies" },
   { value: "jackets", label: "Jackets" },
+  { value: "coats", label: "Coats" },
   { value: "vests", label: "Vests" },
   { value: "dresses", label: "Dresses" },
-  { value: "shoes", label: "Shoes" },
+  { value: "sneakers", label: "Sneakers" },
+  { value: "boots", label: "Boots" },
+  { value: "heels", label: "Heels" },
+  { value: "sandals", label: "Sandals" },
+  { value: "flats", label: "Flats" },
+  { value: "loafers", label: "Loafers" },
   { value: "socks", label: "Socks" },
   { value: "bracelets", label: "Bracelets" },
   { value: "rings", label: "Rings" },
@@ -71,14 +78,28 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
     name: "t-shirt",
     maxPerOutfit: 1,
     priority: 5,
-    conflicts: ["sweaters", "dresses"], // Can't wear with other base tops or dresses
+    conflicts: ["sweaters", "tops", "dresses"], // Can't wear with other base tops or dresses
+  },
+  tops: {
+    type: "base",
+    name: "tops",
+    maxPerOutfit: 1,
+    priority: 5,
+    conflicts: [
+      "tshirts",
+      "sweaters",
+      "hoodies",
+      "vests",
+      "jackets",
+      "dresses",
+    ], // Can only wear with coats (outer layer)
   },
   sweaters: {
     type: "base",
     name: "sweater",
     maxPerOutfit: 1,
     priority: 6,
-    conflicts: ["tshirts", "hoodies", "dresses"], // Can't wear with other base tops, hoodies, or dresses
+    conflicts: ["tshirts", "tops", "hoodies", "dresses"], // Can't wear with other base tops, hoodies, or dresses
   },
 
   // Tops - Layer (can layer over base, but only one layer type)
@@ -87,7 +108,7 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
     name: "hoodie",
     maxPerOutfit: 1,
     priority: 5,
-    conflicts: ["sweaters", "vests", "jackets", "dresses"], // Can't wear with sweaters, other layers, or dresses
+    conflicts: ["sweaters", "tops", "vests", "jackets", "dresses"], // Can't wear with sweaters, tops, other layers, or dresses
     requires: ["tshirts"], // Should have a base layer underneath
   },
   vests: {
@@ -96,7 +117,7 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
     maxPerOutfit: 1,
     priority: 4,
     requires: ["tshirts"], // Should have a base layer underneath
-    conflicts: ["hoodies", "jackets", "dresses"], // Can't wear with other layers or dresses
+    conflicts: ["hoodies", "tops", "jackets", "dresses"], // Can't wear with tops, other layers, or dresses
   },
 
   // Tops - Outer Layer (can go over everything, but only one outer)
@@ -105,7 +126,14 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
     name: "jacket",
     maxPerOutfit: 1,
     priority: 6,
-    conflicts: ["hoodies", "vests", "dresses"], // Can't wear with layers that would be bulky underneath, or dresses
+    conflicts: ["hoodies", "vests", "tops", "dresses"], // Can't wear with layers that would be bulky underneath, tops, or dresses
+  },
+  coats: {
+    type: "outer",
+    name: "coat",
+    maxPerOutfit: 1,
+    priority: 7,
+    conflicts: ["hoodies", "vests", "jackets", "dresses"], // Can't wear with layers or other outerwear except can work with tops
   },
 
   // Bottoms (only one bottom type allowed, all conflict with each other)
@@ -144,18 +172,58 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
       "tshirts",
       "sweaters",
       "hoodies",
-      "vests", // No tops under dresses (jackets ok for layering)
+      "vests", // No tops or layers under dresses (except coats for layering)
+      "tops",
     ],
   },
 
   // Footwear (required, only one pair of shoes)
-  shoes: {
+  sneakers: {
     type: "shoes",
-    name: "shoes",
+    name: "sneakers",
     maxPerOutfit: 1,
     priority: 5,
     requires: ["socks"], // Should have socks with shoes
-    conflicts: [], // Shoes go with everything
+    conflicts: ["boots", "heels", "sandals", "flats", "loafers"], // Only one type of shoe
+  },
+  boots: {
+    type: "shoes",
+    name: "boots",
+    maxPerOutfit: 1,
+    priority: 6,
+    requires: ["socks"], // Should have socks with shoes
+    conflicts: ["sneakers", "heels", "sandals", "flats", "loafers"], // Only one type of shoe
+  },
+  heels: {
+    type: "shoes",
+    name: "heels",
+    maxPerOutfit: 1,
+    priority: 6,
+    requires: ["socks"], // Should have socks with shoes
+    conflicts: ["sneakers", "boots", "sandals", "flats", "loafers"], // Only one type of shoe
+  },
+  sandals: {
+    type: "shoes",
+    name: "sandals",
+    maxPerOutfit: 1,
+    priority: 4,
+    conflicts: ["sneakers", "boots", "heels", "flats", "loafers"], // Only one type of shoe, no socks needed
+  },
+  flats: {
+    type: "shoes",
+    name: "flats",
+    maxPerOutfit: 1,
+    priority: 5,
+    requires: ["socks"], // Should have socks with shoes
+    conflicts: ["sneakers", "boots", "heels", "sandals", "loafers"], // Only one type of shoe
+  },
+  loafers: {
+    type: "shoes",
+    name: "loafers",
+    maxPerOutfit: 1,
+    priority: 6,
+    requires: ["socks"], // Should have socks with shoes
+    conflicts: ["sneakers", "boots", "heels", "sandals", "flats"], // Only one type of shoe
   },
   socks: {
     type: "accessory",
@@ -193,10 +261,18 @@ export const CATEGORY_TYPE_MAP: Record<string, Category> = {
 export const CATEGORY_GROUPS: {
   [key: string]: string[];
 } = {
-  TOPS: ["tshirts", "sweaters", "hoodies", "jackets", "vests"],
+  TOPS: ["tshirts", "tops", "sweaters", "hoodies", "jackets", "coats", "vests"],
   BOTTOMS: ["shorts", "pants", "skirts"],
   DRESSES: ["dresses"],
-  FOOTWEAR: ["shoes", "socks"],
+  FOOTWEAR: [
+    "sneakers",
+    "boots",
+    "heels",
+    "sandals",
+    "flats",
+    "loafers",
+    "socks",
+  ],
   ACCESSORIES: ["bracelets", "rings", "necklaces"],
 } as const;
 
@@ -231,12 +307,52 @@ export const COLOR_CONSTANTS: {
 // Outfit generation constants
 export const OUTFIT_CONSTANTS = {
   MIN_ITEMS_FOR_GENERATION: 3,
-  MIN_OUTFIT_SCORE: 60,
+  MIN_OUTFIT_SCORE: 50, // Lowered to allow more variety
   MAX_GENERATION_ATTEMPTS: 100,
   DEFAULT_OUTFIT_COUNT: 5,
   OUTERWEAR_CHANCE: 0.4, // 40% chance to add outerwear
   DRESS_FOUNDATION_CHANCE: 0.3, // 30% chance to build around dress
   ACCESSORY_RANGE: { min: 1, max: 3 },
+
+  // T-shirt layering logic based on occasion and season
+  TSHIRT_LAYERING_RULES: {
+    STANDALONE_OCCASIONS: ["casual", "summer", "party"], // T-shirt can be standalone
+    LAYER_REQUIRED_OCCASIONS: ["formal", "business", "winter"], // T-shirt needs layers
+    OPTIONAL_LAYER_OCCASIONS: ["spring", "fall"], // T-shirt may or may not need layers
+    STANDALONE_CHANCE: 0.6, // 60% chance to keep t-shirt standalone for casual occasions
+  },
+
+  // Occasion-based outfit logic
+  OCCASION_RULES: {
+    FORMAL: {
+      REQUIRED_LAYERS: true,
+      MIN_PIECES: 3,
+      AVOID_CATEGORIES: ["shorts", "hoodies"],
+      PREFER_CATEGORIES: ["dresses", "pants", "jackets"],
+    },
+    BUSINESS: {
+      REQUIRED_LAYERS: true,
+      MIN_PIECES: 3,
+      AVOID_CATEGORIES: ["shorts", "tshirts"],
+      PREFER_CATEGORIES: ["sweaters", "pants", "jackets"],
+    },
+    CASUAL: {
+      REQUIRED_LAYERS: false,
+      MIN_PIECES: 2,
+      FLEXIBLE: true,
+    },
+    SUMMER: {
+      REQUIRED_LAYERS: false,
+      MIN_PIECES: 2,
+      AVOID_CATEGORIES: ["hoodies", "jackets"],
+      PREFER_CATEGORIES: ["tshirts", "shorts", "dresses"],
+    },
+    WINTER: {
+      REQUIRED_LAYERS: true,
+      MIN_PIECES: 3,
+      PREFER_CATEGORIES: ["sweaters", "hoodies", "jackets", "pants"],
+    },
+  },
 
   // Outfit composition rules
   REQUIRED_COMPONENTS: {
@@ -255,16 +371,24 @@ export const OUTFIT_CONSTANTS = {
     OVER_BASE: ["hoodies", "vests"], // Can go over base layer
     OVER_LAYER: ["jackets"], // Can go over layer
     WITH_DRESS: ["jackets"], // Only jackets can be worn over dresses
+    CONFLICTS: {
+      // These combinations should never happen
+      dresses: ["tshirts", "sweaters", "pants", "shorts", "skirts"], // Dress replaces top+bottom
+      vests: ["hoodies", "jackets"], // Vests conflict with other layers
+      hoodies: ["vests", "sweaters"], // Hoodies are a primary layer
+    },
   },
 } as const;
 
 // Score thresholds and weights
 export const SCORING_CONSTANTS = {
-  COLOR_HARMONY_WEIGHT: 0.35,
-  COMPLETENESS_WEIGHT: 0.35,
-  STYLE_COHERENCE_WEIGHT: 0.3,
-  COLOR_COMPATIBILITY_WEIGHT: 0.6,
+  COLOR_HARMONY_WEIGHT: 0.25, // Reduced from 0.35
+  COMPLETENESS_WEIGHT: 0.35, // Clothing logic gets more weight
+  STYLE_COHERENCE_WEIGHT: 0.25, // Style matching
+  LOGICAL_COMPATIBILITY_WEIGHT: 0.15, // New: logical clothing combinations
+  COLOR_COMPATIBILITY_WEIGHT: 0.4, // Reduced from 0.6
   TAG_COMPATIBILITY_WEIGHT: 0.4,
+  LAYERING_LOGIC_WEIGHT: 0.2, // New: proper layering logic
   EXCELLENT_SCORE_THRESHOLD: 80,
   GOOD_SCORE_THRESHOLD: 60,
   OKAY_SCORE_THRESHOLD: 40,

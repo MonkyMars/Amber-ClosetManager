@@ -179,9 +179,9 @@ const New = () => {
 											<Image
 												src={imagePreview}
 												alt="Preview"
-												width={128}
-												height={128}
-												className="mx-auto h-32 w-32 object-cover rounded-lg"
+												width={200}
+												height={200}
+												className="mx-auto h-48 w-48 object-cover rounded-lg"
 											/>
 											<button
 												type="button"
